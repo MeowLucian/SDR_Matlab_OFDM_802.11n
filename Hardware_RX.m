@@ -39,31 +39,30 @@ while(state == 1)
         drawnow;
         
         % ----- Demodulation -----%
-        [M_n,M_n_2,Threshold_graph,Threshold_graph_2,H_hat_time,H_hat_time_2,RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer,RX_Payload_1_no_pilot,RX_Payload_2_no_pilot,BER] = OFDM_RX(RX,Parameters_struct);
+        [M_n,Threshold_graph,H_hat_time,RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer,RX_Payload_1_no_pilot,RX_Payload_2_no_pilot,BER] = OFDM_RX(RX,Parameters_struct);
         subplot(2,4,5),plot(1:length(M_n),M_n,1:length(M_n),Threshold_graph);title('Packet Detection');axis([1,length(M_n),0,1.2]);axis square;
-%         subplot(2,4,3),plot(1:length(M_n_2),M_n_2,1:length(M_n_2),Threshold_graph_2);title('Packet Detection');axis([1,length(M_n_2),0,1.2]);axis square;
-        drawnow;
-        subplot(2,4,6),plot(abs(H_hat_time));
+        %--------------------------------------------------------------------------------%
+        subplot(2,4,6),plot(abs(H_hat_time(1,:)));
         hold on;
-        subplot(2,4,6),plot(abs(H_hat_time_2));
+        subplot(2,4,6),plot(abs(H_hat_time(2,:)));
+        subplot(2,4,6),plot(abs(H_hat_time(3,:)));
+        subplot(2,4,6),plot(abs(H_hat_time(4,:)));
         hold off;
         title('Channel Estimation');
-%         axis([1 64 0 7]);
-        axis square;
-
+        legend('H11','H12','H21','H22');
+        axis square;axis([1 64 0 5]);
+        %--------------------------------------------------------------------------------%
         subplot(2,4,7),plot(RX_Payload_1_no_Equalizer,'*');
         hold on
         subplot(2,4,7),plot(RX_Payload_2_no_Equalizer,'*');
         hold off
         title('Before Equalizer');axis([-8 8 -8 8]);axis square;
-        
+        %--------------------------------------------------------------------------------%
         subplot(2,4,8),plot(RX_Payload_1_no_pilot,'*');
         hold on
         subplot(2,4,8),plot(RX_Payload_2_no_pilot,'*');
         hold off
         title({'Demodulation';['BER = ',num2str(BER)]});axis([-1.5 1.5 -1.5 1.5]);axis square;
-        
-        set(gcf,'Units','centimeters','position',[1 2 49 24]); % GUI window size
         
         Run_time_number = Run_time_number+1;
     end % Start

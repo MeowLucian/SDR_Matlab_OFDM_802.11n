@@ -1,4 +1,4 @@
-function [M_n,M_n_2,Threshold_graph,Threshold_graph_2,H_hat_time,H_hat_time_2,RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer,RX_Payload_1_no_pilot,RX_Payload_2_no_pilot,BER] = OFDM_RX(RX,Parameters_struct)
+function [M_n,Threshold_graph,H_hat_time,RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer,RX_Payload_1_no_pilot,RX_Payload_2_no_pilot,BER] = OFDM_RX(RX,Parameters_struct)
 %% Debug mode
 Debug_mode = 'off';
 if strcmp(Debug_mode,'on')
@@ -31,19 +31,19 @@ end
 M_n = (abs(C_n).^2)./(P_n.^2);
 
 % M_n_2
-C_n_2 = zeros(1,length(RX_signal_2)-D+1-L);
-P_n_2 = zeros(1,length(RX_signal_2)-D+1-L);
-C_k_2 = zeros(1,L);
-P_k_2 = zeros(1,L);
-for n=1:length(RX_signal_2)-D+1-L
-    for k=1:L
-        C_k_2(k) = RX_signal_2(n+k-1)*complex(RX_signal_2(n+k-1+D));
-        P_k_2(k) = abs(RX_signal_2(n+k-1+D))^2;
-    end
-    C_n_2(n) = sum(C_k_2);
-    P_n_2(n) = sum(P_k_2);
-end
-M_n_2 = (abs(C_n_2).^2)./(P_n_2.^2);
+% C_n_2 = zeros(1,length(RX_signal_2)-D+1-L);
+% P_n_2 = zeros(1,length(RX_signal_2)-D+1-L);
+% C_k_2 = zeros(1,L);
+% P_k_2 = zeros(1,L);
+% for n=1:length(RX_signal_2)-D+1-L
+%     for k=1:L
+%         C_k_2(k) = RX_signal_2(n+k-1)*complex(RX_signal_2(n+k-1+D));
+%         P_k_2(k) = abs(RX_signal_2(n+k-1+D))^2;
+%     end
+%     C_n_2(n) = sum(C_k_2);
+%     P_n_2(n) = sum(P_k_2);
+% end
+% M_n_2 = (abs(C_n_2).^2)./(P_n_2.^2);
 %% Packet_select
 Threshold = 0.78;
 loc = find(M_n>Threshold);
@@ -63,21 +63,21 @@ Threshold_graph = Threshold*ones(1,length(M_n));
 Threshold_graph(idx-1) = 1.15;
 
 % M_n_2
-loc = find(M_n_2>Threshold);
-temp_4 = [loc,0];
-temp_5 = [0,loc];
-temp_6 = temp_4-temp_5;
-Packet_Front_2 = find(temp_6>400);
-Packet_Front_idx_2 = loc(Packet_Front_2);
-
-for x=1:length(Packet_Front_idx_2)-1
-    if M_n_2(Packet_Front_idx_2(x)+Length_over_Threshold)>Threshold;
-        idx_2 = Packet_Front_idx_2(x)+1;
-    end % if Loop
-end % for Loop
-
-Threshold_graph_2 = Threshold*ones(1,length(M_n));
-Threshold_graph_2(idx-1) = 1.15;
+% loc = find(M_n_2>Threshold);
+% temp_4 = [loc,0];
+% temp_5 = [0,loc];
+% temp_6 = temp_4-temp_5;
+% Packet_Front_2 = find(temp_6>400);
+% Packet_Front_idx_2 = loc(Packet_Front_2);
+% 
+% for x=1:length(Packet_Front_idx_2)-1
+%     if M_n_2(Packet_Front_idx_2(x)+Length_over_Threshold)>Threshold;
+%         idx_2 = Packet_Front_idx_2(x)+1;
+%     end % if Loop
+% end % for Loop
+% 
+% Threshold_graph_2 = Threshold*ones(1,length(M_n));
+% Threshold_graph_2(idx-1) = 1.15;
 %% Downsampling
 OVR = 2;
 Frame_DWN_sampling = RX_signal(idx:OVR:OVR*624+idx-1); % [1x624] Frame length
@@ -132,8 +132,11 @@ H_hat(2,1,Set_1_index+6) = estimation_4(Set_1_index+6);
 % H22_hat
 H_hat(2,2,Set_1_index+6) = estimation_3(Set_1_index+6);
 H_hat(2,2,Set_0_index+6) = estimation_4(Set_0_index+6);
-H_hat_time = ifft(ifftshift(reshape(H_hat(1,1,1:64),1,64)));
-H_hat_time_2 = ifft(ifftshift(reshape(H_hat(2,2,1:64),1,64)));
+H_hat_time_11 = ifft(ifftshift(reshape(H_hat(1,1,1:64),1,64)));
+H_hat_time_12 = ifft(ifftshift(reshape(H_hat(1,2,1:64),1,64)));
+H_hat_time_21 = ifft(ifftshift(reshape(H_hat(2,1,1:64),1,64)));
+H_hat_time_22 = ifft(ifftshift(reshape(H_hat(2,2,1:64),1,64)));
+H_hat_time = [H_hat_time_11;H_hat_time_12;H_hat_time_21;H_hat_time_22];
 %% One tap Equalizer with zero-forcing
 RX_Payload_1_time = Frame_After_Fine(464+1:464+80); % [1x80]
 RX_Payload_1_no_CP = RX_Payload_1_time(17:end); % [1x64]
@@ -176,13 +179,15 @@ if strcmp(Debug_mode,'on')
     title('Welch Power Spectral Density');axis square;
     %--------------------------------------------------------------------------------%
     subplot(2,4,5),plot(1:length(M_n),M_n,1:length(M_n),Threshold_graph);title('Packet Detection');axis([1,length(M_n),0,1.2]);axis square;
-    subplot(2,4,6),plot(abs(H_hat_time));
+    subplot(2,4,6),plot(abs(H_hat_time(1,:)));
     hold on;
-    subplot(2,4,6),plot(abs(H_hat_time_2));
+    subplot(2,4,6),plot(abs(H_hat_time(2,:)));
+    subplot(2,4,6),plot(abs(H_hat_time(3,:)));
+    subplot(2,4,6),plot(abs(H_hat_time(4,:)));
     hold off;
     title('Channel Estimation');
-    axis square;
-    %     axis([1 64 0 7]);
+    legend('H11','H12','H21','H22');
+    axis square;axis([1 64 0 5]);
     %--------------------------------------------------------------------------------%
     subplot(2,4,7),plot(RX_Payload_1_no_Equalizer,'*');
     hold on
