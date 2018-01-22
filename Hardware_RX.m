@@ -10,8 +10,8 @@ rx_object = sdrrx('ZedBoard and FMCOMMS2/3/4',...
            'IPAddress','192.168.3.3',...
            'CenterFrequency',Parameters_struct.CenterFrequency,...
            'BasebandSampleRate', Parameters_struct.Bandwidth,...   % Bandwidth
-           'ChannelMapping', 1,...
-           'SamplesPerFrame', 3000);
+           'ChannelMapping', [1,2],...
+           'SamplesPerFrame', 3500);
 
 Ready_Time = 0;
 scale = 1024;
@@ -25,28 +25,42 @@ while(state == 1)
     if Run_time_number > Ready_Time
         
         % ----- RX Raw -----%
-        data_rx_scaled = double(data_rx_raw)./scale; % [3000x1]
-        RX = data_rx_scaled.'; % [1x3000]
+        data_rx_scaled = double(data_rx_raw)./scale; % [3000x2]
+        RX = data_rx_scaled.'; % [2x3000]
         
-        subplot(2,4,1),plot(RX,'.');title('RX-Raw');axis([-1.5 1.5 -1.5 1.5]);axis square;
-        subplot(2,4,2),plot(real(RX));title('I');axis([1 3000 -1.5 1.5]);axis square;
-        subplot(2,4,3),plot(imag(RX));title('Q');axis([1 3000 -1.5 1.5]);axis square;
+        subplot(2,4,1),plot(RX(1,:),'.');title('RX-Raw');axis([-1.5 1.5 -1.5 1.5]);axis square;
+        subplot(2,4,2),plot(real(RX(1,:)));title('I');axis([1 3000 -1.5 1.5]);axis square;
+        subplot(2,4,3),plot(imag(RX(1,:)));title('Q');axis([1 3000 -1.5 1.5]);axis square;
         
-        [Spectrum_waveform,Welch_Spectrum_frequency] = pwelch(RX,[],[],[],rx_object.BasebandSampleRate,'centered','power');
+        [Spectrum_waveform,Welch_Spectrum_frequency] = pwelch(RX(1,:),[],[],[],rx_object.BasebandSampleRate,'centered','power');
         subplot(2,4,4),plot(Welch_Spectrum_frequency,pow2db(Spectrum_waveform));
         title('Welch Power Spectral Density');axis([-rx_object.BasebandSampleRate/2 rx_object.BasebandSampleRate/2 -100 -10]);axis square;
         
         drawnow;
         
         % ----- Demodulation -----%
-        [M_n,Threshold_graph,H_est_time,RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer,RX_Payload_1_no_pilot,RX_Payload_2_no_pilot,BER] = OFDM_RX(RX,Parameters_struct);
+        [M_n,M_n_2,Threshold_graph,Threshold_graph_2,H_hat_time,H_hat_time_2,RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer,RX_Payload_1_no_pilot,RX_Payload_2_no_pilot,BER] = OFDM_RX(RX,Parameters_struct);
         subplot(2,4,5),plot(1:length(M_n),M_n,1:length(M_n),Threshold_graph);title('Packet Detection');axis([1,length(M_n),0,1.2]);axis square;
-        subplot(2,4,6),plot(abs(H_est_time));title('Channel Estimation');axis([1 64 0 7]);axis square;
+%         subplot(2,4,3),plot(1:length(M_n_2),M_n_2,1:length(M_n_2),Threshold_graph_2);title('Packet Detection');axis([1,length(M_n_2),0,1.2]);axis square;
+        drawnow;
+        subplot(2,4,6),plot(abs(H_hat_time));
+        hold on;
+        subplot(2,4,6),plot(abs(H_hat_time_2));
+        hold off;
+        title('Channel Estimation');
+%         axis([1 64 0 7]);
+        axis square;
 
-        subplot(2,4,7),plot([RX_Payload_1_no_Equalizer,RX_Payload_2_no_Equalizer],'*');
+        subplot(2,4,7),plot(RX_Payload_1_no_Equalizer,'*');
+        hold on
+        subplot(2,4,7),plot(RX_Payload_2_no_Equalizer,'*');
+        hold off
         title('Before Equalizer');axis([-8 8 -8 8]);axis square;
         
-        subplot(2,4,8),plot([RX_Payload_1_no_pilot,RX_Payload_2_no_pilot],'*');
+        subplot(2,4,8),plot(RX_Payload_1_no_pilot,'*');
+        hold on
+        subplot(2,4,8),plot(RX_Payload_2_no_pilot,'*');
+        hold off
         title({'Demodulation';['BER = ',num2str(BER)]});axis([-1.5 1.5 -1.5 1.5]);axis square;
         
         set(gcf,'Units','centimeters','position',[1 2 49 24]); % GUI window size
