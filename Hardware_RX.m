@@ -50,7 +50,7 @@ while(state == 1)
         hold off;
         title('Channel Estimation');
         legend('H11','H12','H21','H22');
-        axis square;axis([1 64 0 5]);
+        axis square;axis([1 64 0 5]);xlabel('Time');
         %--------------------------------------------------------------------------------%
         subplot(2,4,7),plot(RX_Payload_1_no_Equalizer,'*');
         hold on
