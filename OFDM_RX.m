@@ -186,7 +186,7 @@ if strcmp(Debug_mode,'on')
     subplot(2,4,6),plot(abs(H_hat_time(4,:)));
     hold off;
     title('Channel Estimation');
-    legend('H11','H12','H21','H22');
+    legend('H11','H12','H21','H22');xlabel('Time');
     axis square;axis([1 64 0 5]);
     %--------------------------------------------------------------------------------%
     subplot(2,4,7),plot(RX_Payload_1_no_Equalizer,'*');
