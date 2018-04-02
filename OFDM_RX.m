@@ -9,8 +9,8 @@ end
 %% j Parameter
 j = 1i;
 %% RX
-RX_signal = RX(1,:); % [1x3000]
-RX_signal_2 = RX(2,:); % [1x3000]
+RX_signal = RX(1,:); % [1x3500]
+RX_signal_2 = RX(2,:); % [1x3500]
 %% Packet Detection
 D = 16;
 L = 32;
@@ -55,7 +55,7 @@ Packet_Front_idx = loc(Packet_Front);
 Length_over_Threshold = 250;
 
 for x=1:length(Packet_Front_idx)-1
-    if M_n(Packet_Front_idx(x)+Length_over_Threshold)>Threshold;
+    if M_n(Packet_Front_idx(x)+Length_over_Threshold)>Threshold
         idx = Packet_Front_idx(x)+1;
     end % if Loop
 end % for Loop

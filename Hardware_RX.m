@@ -25,8 +25,8 @@ while(state == 1)
     if Run_time_number > Ready_Time
         
         % ----- RX Raw -----%
-        data_rx_scaled = double(data_rx_raw)./scale; % [3000x2]
-        RX = data_rx_scaled.'; % [2x3000]
+        data_rx_scaled = double(data_rx_raw)./scale; % [3500x2]
+        RX = data_rx_scaled.'; % [2x3500]
         
         subplot(2,4,1),plot(RX(1,:),'.');title('RX-Raw');axis([-1.5 1.5 -1.5 1.5]);axis square;
         subplot(2,4,2),plot(real(RX(1,:)));title('I');axis([1 3000 -1.5 1.5]);axis square;
