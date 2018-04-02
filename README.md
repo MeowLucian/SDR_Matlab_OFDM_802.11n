@@ -26,11 +26,13 @@ Please open multiple Matlab windows to run `Hardware_TX.m` and `Hardware_RX.m` r
 * data_Payload_1.mat
 * data_Payload_2.mat
 * oversamp.m
+* setstate0_TX.m
 
 ## Hardware_RX.m
 > OFDM_RX.m
 * Long_preamble_slot_Frequency.mat
-* setstate0.m
+* HTL_k_slot_Frequency.mat
+* setstate0_RX.m
 
 ## RX_test
 * RX.mat
@@ -81,6 +83,9 @@ Video Demo : https://www.youtube.com/watch?v=CiHpd1Z8qK8
 > * Long Preamble
 > <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/TX%20System%20Model_Long%20Preamble.png" width="800">
 
+> * HT-Long Preamble (Tone Interleaving)
+> <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/TX%20System%20Model_HTLong%20Preamble.png" width="800">
+
 > * Payload
 > <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/TX%20System%20Model_Payload.png" width="600">
 
@@ -125,14 +130,14 @@ Then, use router DHCP hand setting mode to distribute network configuration para
 > * Packet Detection (normal case) , Threshold=0.75
 > <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/RX%20System%20Model_Packet%20Detection.png" width="600">
 
-> * Packet Detection (problem case & deselect the imperfect packet)
-> <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/RX%20System%20Model_Packet%20Detection(problem).png" width="600">
-
 > * Coarse CFO Estimation & Compensation
 > <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/RX%20System%20Model_Coarse%20CFO%20Estimation.png" width="600">
 
 > * Fine CFO Estimation & Compensation
 > <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/RX%20System%20Model_Fine%20CFO%20Estimation.png" width="600">
+
+> * MIMO Channel Estimation Diagram (Tone Interleaving)
+> <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/RX%20System%20Model_Channel%20Estimation.png" width="600">
 
 > * Channel Estimation & Equalizer
 > <img src="https://raw.githubusercontent.com/MeowLucian/SDR_Matlab_OFDM_802.11n/master/Picture/RX%20System%20Model_Channel%20Estimation%20%26%20Equalizer.png" width="600">
